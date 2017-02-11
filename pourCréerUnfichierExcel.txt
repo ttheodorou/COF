@@ -1,0 +1,70 @@
+/**
+     * méthode pour écrire un personnage en BD
+     * @param perso
+     */
+    public void ecrireUnPersonnage(Personnage perso){
+     // TODO
+        // Vérifier si l'enregistrement existe > modifier
+        // Trouver une ligne non utilisée
+        // Se positionner à cette ligne et écrire
+
+        // Création d'un classeur virtuel
+        XSSFWorkbook classeurAEnregistrer = classeurAEnregistrer = new XSSFWorkbook();        
+
+        // Récupération de la feuille à modifier
+        XSSFSheet feuilleAModifier = classeurAEnregistrer.createSheet(_NOM_FEUILLE_EXL);
+
+        // Récupération de la ligne à enregistrer
+        // Pour l'instant je fais simple
+        XSSFRow ligneAModifier = feuilleAModifier.createRow(_INDEX_PREMIERE_LIGNE_TABLE_PERSO);
+
+        // Je positionne le curseur sur la première cellule
+        int ID_CelluleEnCours = _INDEX_PREMIERE_COLONNE_TABLE_PERSO;
+
+        // j'affecte à chaque cellule sa propriété
+        Cell celluleEnCours = ligneAModifier.createCell(ID_CelluleEnCours++);
+        celluleEnCours.setCellValue(perso.getId());
+        celluleEnCours = ligneAModifier.createCell(ID_CelluleEnCours++);
+        celluleEnCours.setCellValue(perso.getNom());
+        celluleEnCours = ligneAModifier.createCell(ID_CelluleEnCours++);
+        celluleEnCours.setCellValue(perso.getJoueurNom());
+        celluleEnCours = ligneAModifier.createCell(ID_CelluleEnCours++);
+        celluleEnCours.setCellValue(perso.getProfil());
+        celluleEnCours = ligneAModifier.createCell(ID_CelluleEnCours++);
+        celluleEnCours.setCellValue(perso.getNiveau());
+        celluleEnCours = ligneAModifier.createCell(ID_CelluleEnCours++);
+        celluleEnCours.setCellValue(perso.getRace());
+        celluleEnCours = ligneAModifier.createCell(ID_CelluleEnCours++);
+        celluleEnCours.setCellValue(perso.getSexe());
+        celluleEnCours = ligneAModifier.createCell(ID_CelluleEnCours++);
+        celluleEnCours.setCellValue(perso.getAge());
+        celluleEnCours = ligneAModifier.createCell(ID_CelluleEnCours++);
+        celluleEnCours.setCellValue(perso.getTaille());
+        celluleEnCours = ligneAModifier.createCell(ID_CelluleEnCours++);
+        celluleEnCours.setCellValue(perso.getPoids());
+
+        //On écrit sur le fichier
+        FileOutputStream out = null;
+        try {
+            out = new FileOutputStream(new File(_NOM_CLASSEUR_EXL));
+            classeurAEnregistrer.write(out);
+        } catch (FileNotFoundException e) {
+            System.out.println("ba merde : ça plante à la création du FileOutputStream !");
+            e.printStackTrace();
+        } catch (IOException e) {
+            System.out.println("ba merde : ça plante au .write(out) !");
+            e.printStackTrace();
+        }
+        finally {
+            try {
+                if (out!=null) {
+                    out.close();
+                }
+            } catch (IOException e) {
+                System.out.println("ba le out veut pas se fermer !");
+                e.printStackTrace();
+            }
+        }
+
+        System.out.println("je crois que ça a marché");
+    }
