@@ -1,12 +1,16 @@
 package com.thomas.cof.dao;
 
 import com.thomas.cof.domaine.Personnage;
+import org.apache.log4j.Logger;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-import java.io.*;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,11 +19,18 @@ import java.util.List;
  * Created by TS on 11/02/2017.
  */
 public class PersonnageDAO {
+
+    private final static Logger logger = Logger.getLogger(PersonnageDAO.class);
+    
     private static final int _INDEX_PREMIERE_COLONNE_TABLE_PERSO = 1;
     private static final int _INDEX_DERNIERE_COLONNE_TABLE_PERSO = 10;
     private static final int _INDEX_PREMIERE_LIGNE_TABLE_PERSO = 2;
     private static final String _NOM_FEUILLE_EXL = "unAutreNom";
-    private static final String _NOM_CLASSEUR_EXL = "COF_TEST.xlsx";
+    private static final String _NOM_CLASSEUR_EXL_LECTURE = "COF_TEST.xlsx";
+    private static final String _NOM_CLASSEUR_EXL_ECRITURE = "COF_TEST_RESULT.xlsx";    /*Note : on peut mettre le même
+                                                                                        / que en lecture, pas de soucis,
+                                                                                          la seule modif à faire est ici
+                                                                                          */
 
     /**
      * méthode pour écrire un personnage en BD
@@ -34,9 +45,9 @@ public class PersonnageDAO {
 
         FileInputStream file =null;
         try {
-            file = new FileInputStream(_NOM_CLASSEUR_EXL);
+            file = new FileInputStream(_NOM_CLASSEUR_EXL_LECTURE);
         } catch (FileNotFoundException e) {
-            System.out.println("erreur a la création du file");
+            logger.error("erreur a la création du file");
             e.printStackTrace();
         }
 
@@ -46,7 +57,7 @@ public class PersonnageDAO {
         try {
             classeurAEnregistrer = new XSSFWorkbook(file);
         } catch (IOException e) {
-            System.out.println("erreur a la récupération du classeur");
+            logger.error("erreur a la récupération du classeur");
             e.printStackTrace();
         }
 
@@ -112,6 +123,18 @@ public class PersonnageDAO {
         }
         celluleEnCours.setCellValue(perso.getPoids());
 
+
+        //On enregistre les modifications, on utilise le try-with-resource, parce que comme FileOutputStream (et aussi FileInputStream d'ailleur)
+        //implémente l'interface AutoCloseable, on n'a pas besoin de fermer les resources depuis java 7, il le fait tout seul.
+        try(FileOutputStream fileOutputStream = new FileOutputStream(_NOM_CLASSEUR_EXL_ECRITURE)){
+            file.close();
+            classeurAEnregistrer.write(fileOutputStream);
+        }catch (Exception e){
+            e.printStackTrace();
+            logger.error("impossible d'enregistrer le classeur");
+        }
+
+
         try {
             file.close();
         } catch (IOException e) {
@@ -121,13 +144,13 @@ public class PersonnageDAO {
 //        //On écrit sur le fichier
 //        FileOutputStream out = null;
 //        try {
-//            out = new FileOutputStream(new File(_NOM_CLASSEUR_EXL));
+//            out = new FileOutputStream(new File(_NOM_CLASSEUR_EXL_LECTURE));
 //            classeurAEnregistrer.write(out);
 //        } catch (FileNotFoundException e) {
-//            System.out.println("ba merde : ça plante à la création du FileOutputStream !");
+//            logger.error("ba merde : ça plante à la création du FileOutputStream !");
 //            e.printStackTrace();
 //        } catch (IOException e) {
-//            System.out.println("ba merde : ça plante au .write(out) !");
+//            logger.error("ba merde : ça plante au .write(out) !");
 //            e.printStackTrace();
 //        }
 //        finally {
@@ -136,12 +159,12 @@ public class PersonnageDAO {
 //                    out.close();
 //                }
 //            } catch (IOException e) {
-//                System.out.println("ba le out veut pas se fermer !");
+//                logger.error("ba le out veut pas se fermer !");
 //                e.printStackTrace();
 //            }
 //        }
 
-        System.out.println("je crois que ça a marché");
+        logger.debug("je crois que ça a marché");
     }
 
     /**
