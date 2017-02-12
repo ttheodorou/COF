@@ -122,3 +122,7 @@ release.properties
 dependency-reduced-pom.xml
 buildNumber.properties
 .mvn/timing.properties
+
+
+### Personnal ###
+*.log
